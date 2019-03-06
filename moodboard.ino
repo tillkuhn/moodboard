@@ -58,7 +58,7 @@ void mach(int button, int led, int value) {
   int pressed = digitalRead(button);
   if (pressed) {
     digitalWrite(led, HIGH);
-    schick(value);;
+    schick(button,led,value);;
     Serial.print("'button': ");
     Serial.print(button);
     Serial.print(", 'led': ");
@@ -72,14 +72,14 @@ void mach(int button, int led, int value) {
   }
 }
 
-void schick(int value) {
+void schick(int button, int led, int value) {
   HTTPClient http;
   requestId++;
   //https://techtutorialsx.com/2017/05/20/esp32-http-post-requests/
   http.begin(endpoint); //Specify destination for HTTP request
   http.addHeader("Content-Type", "application/json"); //Specify content-type header
   http.addHeader("X-Request-Id", String(requestId)); //Specify content-type header
-  String json = String("{\"requestId\": ") + requestId+ String(", \"value\": ") + value + String("}") ;
+  String json = String("{\"requestId\": ") + requestId+ String(", \"value\": ") + value +  String(", \"button\": ") + button + String("}") ;
   int httpResponseCode = http.POST(json); //Send the actual POST request
   Serial.print(endpoint);
   Serial.print(" JSON: ");
