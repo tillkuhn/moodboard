@@ -17,6 +17,8 @@ const int buttonGreen = 34;
 const int buttonYellow = 32;
 const int buttonRed = 35;
 
+int requestId = 0;
+
 void setup() {
   Serial.begin(112500);
   initWifi();
@@ -63,21 +65,25 @@ void mach(int button, int led, int value) {
     Serial.print(led);
     Serial.print(", 'value': ");
     Serial.print(value);
-    Serial.println("}");
+    Serial.println("");
     delay(800);
   } else {
     digitalWrite(led, LOW);
   }
 }
 
-void schick(int button) {
+void schick(int value) {
   HTTPClient http;
+  requestId++;
   //https://techtutorialsx.com/2017/05/20/esp32-http-post-requests/
   http.begin(endpoint); //Specify destination for HTTP request
-  http.addHeader("Content-Type", "text/plain"); //Specify content-type header
-
-  int httpResponseCode = http.POST("hase"); //Send the actual POST request
-  Serial.println(endpoint);
+  http.addHeader("Content-Type", "application/json"); //Specify content-type header
+  http.addHeader("X-Request-Id", String(requestId)); //Specify content-type header
+  String json = String("{\"requestId\": ") + requestId+ String(", \"value\": ") + value + String("}") ;
+  int httpResponseCode = http.POST(json); //Send the actual POST request
+  Serial.print(endpoint);
+  Serial.print(" JSON: ");
+  Serial.println(json);
   if (httpResponseCode > 0) {
     String response = http.getString();  //Get the response to the request
     Serial.println(httpResponseCode);   //Print return code
